@@ -23,7 +23,7 @@ youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'outtmpl': '%(extractor)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -81,6 +81,19 @@ def discordup(track, url, aurl):
             time.sleep(10)
         idle()
 
+def offlineplayy(file, *, loop=None, stream=False):
+    volume=0.8
+    freq = 44100     # audio CD quality
+    bitsize = -16    # unsigned 16 bit
+    channels = 2     # 1 is mono, 2 is stereo
+    buffer = 2048    # number of samples (experiment to get best sound)
+    pg.mixer.init(freq, bitsize, channels, buffer)
+    pg.mixer.music.set_volume(volume)
+    clock = pg.time.Clock()
+    pg.mixer.music.load("soundcloud-" + file + ".mp3")
+    print("Now Playing {}...".format(file))
+    pg.mixer.music.play()
+
 def from_url(url, *, loop=None, stream=False):
     volume=0.8
     scurl = "https://soundcloud.com/{}".format(url)
@@ -118,6 +131,9 @@ e.pack()
 
 e.focus_set()
 
+def offlineplay():
+    offlineplayy(e.get())
+
 def callback():
     from_url(e.get())
 
@@ -138,6 +154,8 @@ def loop():
 
 b = Button(master, text="Play", width=10, command=callback)
 b.pack()
+off = Button(master, text="Offline Play", width=10, command=offlineplay)
+off.pack()
 stop = Button(master, text="Stop", width=10, command=stop)
 stop.pack()
 pause = Button(master, text="Pause", width=10, command=pause)
