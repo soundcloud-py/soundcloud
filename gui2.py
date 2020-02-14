@@ -22,7 +22,7 @@ youtube_dl.utils.bug_reports_message = lambda: ''
 
 
 ytdl_format_options = {
-    'format': 'bestaudio/best',
+    'format': 'mp3',
     'outtmpl': '%(extractor)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
@@ -31,7 +31,7 @@ ytdl_format_options = {
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True,
-    'default_search': 'auto',
+    'default_search': 'scsearch',
     'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 
@@ -122,6 +122,26 @@ def from_url(url, *, loop=None, stream=False):
     #while pg.mixer.music.get_busy():
     #    clock.tick(30)
 
+def search(query, *, loop=None, stream=False):
+    volume=0.8
+    data = ytdl.extract_info(query)
+    freq = 44100     # audio CD quality
+    bitsize = -16    # unsigned 16 bit
+    channels = 2     # 1 is mono, 2 is stereo
+    buffer = 2048    # number of samples (experiment to get best sound)
+    pg.mixer.init(freq, bitsize, channels, buffer)
+    pg.mixer.music.set_volume(volume)
+    clock = pg.time.Clock()
+    
+    if 'entries' in data:
+        data = data['entries'][0]
+
+    filename = data['url'] if stream else ytdl.prepare_filename(data)
+    pg.mixer.music.load(filename)
+    print("Now Playing {}...".format(query))
+    pg.mixer.music.play()
+    start_time = time.time()
+
 master = Tk()
 master.title('Soundcloud Client v{}'.format(version))
 txr = Label(master, text="Soundcloud Client Made by Artucuno#1898")
@@ -130,6 +150,9 @@ e = Entry(master)
 e.pack()
 
 e.focus_set()
+
+def srch():
+    search(e.get())
 
 def offlineplay():
     offlineplayy(e.get())
@@ -152,6 +175,8 @@ def loop():
     except:
         print("Make sure you press play first!")
 
+src = Button(master, text="Search", width=10, command=srch)
+src.pack()
 b = Button(master, text="Play", width=10, command=callback)
 b.pack()
 off = Button(master, text="Offline Play", width=10, command=offlineplay)
