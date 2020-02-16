@@ -11,6 +11,10 @@ import pygame as pg
 from PIL import Image
 import requests
 from io import BytesIO
+import urllib.request
+from urllib.request import urlopen
+import io
+import base64
 try:
     import rpc
     client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
@@ -44,6 +48,15 @@ ffmpeg_options = {
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
+def download_images(url, title=""):
+    # In order to fetch the image online
+    # WIP
+    try:
+        import urllib.request as uril
+    except ImportError:
+        import urllib as uril
+    uril.urlretrieve(url, "{}.jpg".format(title))
+
 def idle():
     while True:
         start_time = time.time()
@@ -68,7 +81,7 @@ def discordup(track, url, aurl):
         start_time = time.time()
         activity = {
             "state": "Playing a Track... {}".format(aurl),
-            "details": "Soundcloud Client [BETA] v0.1.2",
+            "details": "Soundcloud Client [BETA] v{}".format(version),
             "timestamps": {
                 "start": start_time
             },
@@ -81,7 +94,7 @@ def discordup(track, url, aurl):
         }
         rpc_obj.set_activity(activity)
         while pg.mixer.music.get_busy():
-            time.sleep(10)
+            pass
         idle()
 
 def offlineplayy(file, *, loop=None, stream=False):
@@ -117,13 +130,11 @@ def from_url(url, *, loop=None, stream=False):
     print("Now Playing {}...".format(url))
     pg.mixer.music.play()
     start_time = time.time()
-    #if discordsupport == True:
-    #    discordup(filename, scurl, url)
-    #    print("[Discord] Set Rich Presence!")
-    #else:
-    #    print("[Discord] Discord not Found!")
-    #while pg.mixer.music.get_busy():
-    #    clock.tick(30)
+    if discordsupport == True:
+        discordup(filename, scurl, url)
+        print("[Discord] Set Rich Presence!")
+    else:
+        print("[Discord] Discord not Found!")
 
 def search(query, *, loop=None, stream=False):
     volume=0.8
@@ -144,11 +155,14 @@ def search(query, *, loop=None, stream=False):
     print("Now Playing {}...".format(data['title']))
     nowplaying = Tk()
     nowplaying.title('{} - Soundcloud Client v{}'.format(data['title'], version))
-    np = Label(nowplaying, text="Now Playing: {} by {}".format(data['title'], data['uploader']))
+    np = Label(nowplaying, text="Now Playing: {} by {}\n\nViews: {} | Likes: {} | Reposts: {}\nDuration: {}seconds".format(data['title'], data['uploader'], data['view_count'], data['like_count'], data['repost_count'], data['duration']))
     np.pack()
+    #image_byt = urlopen(data['thumbnail']).read()
+    #image_b64 = base64.encodestring(image_byt)
+    #photo = PhotoImage(data=image_b64)
     #canvas = Canvas(nowplaying, width = 512, height = 512)      
     #canvas.pack()  
-    #canvas.create_image(20,20, anchor=NW, image=Image.open(requests.get(data['thumbnail'], stream=True).raw))
+    #canvas.create_image(20,20, anchor=NW, image=photo)
     pg.mixer.music.play()
     start_time = time.time()
 
