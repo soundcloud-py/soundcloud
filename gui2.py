@@ -1,4 +1,4 @@
-version = "v0.1.2"
+version = "0.2.1"
 
 # Discord RPC doesn't work for this version at the moment!
 
@@ -8,6 +8,9 @@ import youtube_dl
 import os
 import sys
 import pygame as pg
+from PIL import Image
+import requests
+from io import BytesIO
 try:
     import rpc
     client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
@@ -138,7 +141,14 @@ def search(query, *, loop=None, stream=False):
 
     filename = data['url'] if stream else ytdl.prepare_filename(data)
     pg.mixer.music.load(filename)
-    print("Now Playing {}...".format(query))
+    print("Now Playing {}...".format(data['title']))
+    nowplaying = Tk()
+    nowplaying.title('{} - Soundcloud Client v{}'.format(data['title'], version))
+    np = Label(nowplaying, text="Now Playing: {} by {}".format(data['title'], data['uploader']))
+    np.pack()
+    #canvas = Canvas(nowplaying, width = 512, height = 512)      
+    #canvas.pack()  
+    #canvas.create_image(20,20, anchor=NW, image=Image.open(requests.get(data['thumbnail'], stream=True).raw))
     pg.mixer.music.play()
     start_time = time.time()
 
@@ -191,12 +201,14 @@ resu.pack()
 lop = Button(master, text="Loop", width=10, command=loop)
 lop.pack()
 
-mainloop()
-e = Entry(master, width=50)
 e.pack()
+canvas = Canvas(master, width = 512, height = 512)      
+canvas.pack()      
+img = PhotoImage(file="data/assets/sc.png")      
+canvas.create_image(20,20, anchor=NW, image=img) 
 
 text = e.get()
-
+mainloop()
 
 text = content.get()
 content.set(text)
