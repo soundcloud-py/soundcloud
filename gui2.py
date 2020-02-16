@@ -147,7 +147,7 @@ def search(query, *, loop=None, stream=False):
             if minu == 60:
                 hur +=1
                 minu = 0
-    np = Label(nowplaying, text="Now Playing: {} by {}\n\nViews: {} | Likes: {} | Reposts: {}\nDuration: {}hr:{}min:{}sec".format(data['title'], data['uploader'], data['view_count'], data['like_count'], data['repost_count'], hur, minu, sec))
+    np = Label(nowplaying, text="Now Playing: {} by {}\n\nViews: {} | Likes: {} | Reposts: {}\nDuration: {}:{}:{}".format(data['title'], data['uploader'], data['view_count'], data['like_count'], data['repost_count'], hur, minu, sec))
     np.pack()
     #image_byt = urlopen(data['thumbnail']).read()
     #image_b64 = base64.encodestring(image_byt)
@@ -161,7 +161,7 @@ def search(query, *, loop=None, stream=False):
         discordup(filename, data['url'], data['title'], data['uploader'])
         print("[Discord] Set Rich Presence!")
     else:
-        print("[Discord] Discord not Found!")
+        print("[Discord] Discord client not Found!")
 
 master = Tk()
 master.title('Soundcloud Client v{}'.format(version))
