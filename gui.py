@@ -1,4 +1,4 @@
-version = "0.2.2"
+version = "0.2.3"
 
 # Discord RPC currently supported
 
@@ -16,13 +16,25 @@ from urllib.request import urlopen
 import io
 import base64
 import webbrowser
-try:
-    import rpc
-    client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
-    rpc_obj = rpc.DiscordIpcClient.for_platform(client_id)
-    print("RPC connection successful.")
-    discordsupport = True
-except:
+import config
+if os.path.isdir('data/songs'):
+    print("[S] Offline songs Found")
+else:
+    try:
+        os.mkdir('data/songs')
+        print("[S] Created Songs Directory")
+    except:
+        pass
+if config.rpc == True:
+    try:
+        import rpc
+        client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
+        rpc_obj = rpc.DiscordIpcClient.for_platform(client_id)
+        print("RPC connection successful.")
+        discordsupport = True
+    except:
+        discordsupport = False
+else:
     discordsupport = False
 import time
 
@@ -31,7 +43,7 @@ youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
     'format': 'mp3',
-    'outtmpl': '%(extractor)s-%(title)s.%(ext)s',
+    'outtmpl': 'data/songs/%(extractor)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -51,7 +63,7 @@ ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 def download_images(url, title=""):
     # In order to fetch the image online
-    # WIP
+    # Now playing will show Thumbnails eventually
     try:
         import urllib.request as uril
     except ImportError:
@@ -88,8 +100,17 @@ def offlineplayy(file, *, loop=None, stream=False):
     pg.mixer.init(freq, bitsize, channels, buffer)
     pg.mixer.music.set_volume(volume)
     clock = pg.time.Clock()
-    pg.mixer.music.load("soundcloud-" + file + ".mp3")
+    pg.mixer.music.load("data/songs/soundcloud-" + file + ".mp3")
+    nowplaying = Tk()
+    nowplaying.title('{} - Soundcloud Client v{}'.format(file, version))
+    sec = 0
+    minu = 0
+    hur = 0
+    np = Label(nowplaying, text="Now Playing: {}".format(file))
+    np.pack()
     print("Now Playing {}...".format(file))
+    if config.mpop == True:
+        mcont()
     pg.mixer.music.play()
 
 def from_url(url, *, loop=None, stream=False):
@@ -110,6 +131,23 @@ def from_url(url, *, loop=None, stream=False):
     filename = data['url'] if stream else ytdl.prepare_filename(data)
     pg.mixer.music.load(filename)
     print("Now Playing {}...".format(url))
+    nowplaying = Tk()
+    nowplaying.title('{} - Soundcloud Client v{}'.format(data['title'], version))
+    sec = 0
+    minu = 0
+    hur = 0
+    for f in range(int(data['duration'])):
+        sec += 1
+        if sec == 60:
+            minu += 1
+            sec = 0
+            if minu == 60:
+                hur +=1
+                minu = 0
+    np = Label(nowplaying, text="Now Playing: {} by {}\n\nViews: {} | Likes: {} | Reposts: {}\nDuration: {}:{}:{}".format(data['title'], data['uploader'], data['view_count'], data['like_count'], data['repost_count'], hur, minu, sec))
+    np.pack()
+    if config.mpop == True:
+        mcont()
     pg.mixer.music.play()
     start_time = time.time()
     if discordsupport == True:
@@ -117,6 +155,18 @@ def from_url(url, *, loop=None, stream=False):
         print("[Discord] Set Rich Presence!")
     else:
         print("[Discord] Discord not Found!")
+
+def mcont():
+    ctrl = Tk()
+    ctrl.title('Controls - Soundcloud Client v{}'.format(version))
+    stopp = Button(ctrl, text="Stop", width=10, command=stop)
+    stopp.pack()
+    pausee = Button(ctrl, text="Pause", width=10, command=pause)
+    pausee.pack()
+    resuu = Button(ctrl, text="Resume", width=10, command=resume)
+    resuu.pack()
+    lopp = Button(ctrl, text="Loop", width=10, command=loop)
+    lopp.pack()
 
 def search(query, *, loop=None, stream=False):
     volume=0.8
@@ -158,11 +208,39 @@ def search(query, *, loop=None, stream=False):
     #canvas.create_image(20,20, anchor=NW, image=photo)
     pg.mixer.music.play()
     start_time = time.time()
+    if config.mpop == True:
+        mcont()
     if discordsupport == True:
         discordup(filename, data['url'], data['title'], data['uploader'])
         print("[Discord] Set Rich Presence!")
     else:
         print("[Discord] Discord client not Found!")
+
+def update():
+    print("Updating:\n"
+          "--------------")
+    os.system('git pull origin master')
+    input("Upadte Done! Restart Required! Push Enter to continue.")
+    sys.exit(1)
+
+def github():
+    webbrowser.open('https://github.com/Articuno1234/soundcloud')
+
+def info():
+    infod = Tk()
+    infod.title('Info - Soundcloud Client v{}'.format(version))
+    np = Label(infod, text="SoundCloud Client v{}\n"
+               "--------\n"
+               "Developers:\n"
+               "Artucuno#1898\n"
+               "\n"
+               "--------\n"
+               "".format(version))
+    np.pack()
+    gith = Button(infod, text="Github", width=10, command=github)
+    gith.pack()
+    upd = Button(infod, text="Update", width=10, command=update)
+    upd.pack()
 
 master = Tk()
 master.title('Soundcloud Client v{}'.format(version))
@@ -173,23 +251,50 @@ e.pack()
 
 e.focus_set()
 
+def infom():
+    info()
+
 def srch():
-    search(e.get())
+    try:
+        search(e.get())
+    except:
+        print("There was an Error or there is no network connection!")
 
 def offlineplay():
-    offlineplayy(e.get())
+    if e.get() == "":
+        return print("Nothing was entered!")
+    try:
+        offlineplayy(e.get())
+    except:
+        print("There was an error!")
 
 def callback():
-    from_url(e.get())
+    try:
+        from_url(e.get())
+    except:
+        print("There was an Error or there is no network connection!")
+    
 
 def stop():
-    pg.mixer.music.stop()
+    try:
+        pg.mixer.music.stop()
+    except:
+        print("Make sure you press play first!")
 
 def pause():
-    pg.mixer.music.pause()
+    try:
+        pg.mixer.music.pause()
+    except:
+        print("Make sure you press play first!")
 
 def resume():
-    pg.mixer.music.unpause()
+    try:
+        pg.mixer.music.unpause()
+    except:
+        print("Make sure you press play first!")
+
+def ctra():
+    mcont()
 
 def loop():
     try:
@@ -203,24 +308,27 @@ b = Button(master, text="Play", width=10, command=callback)
 b.pack()
 off = Button(master, text="Offline Play", width=10, command=offlineplay)
 off.pack()
-stop = Button(master, text="Stop", width=10, command=stop)
-stop.pack()
-pause = Button(master, text="Pause", width=10, command=pause)
-pause.pack()
-resu = Button(master, text="Resume", width=10, command=resume)
-resu.pack()
-
-lop = Button(master, text="Loop", width=10, command=loop)
-lop.pack()
+if config.mpop == False:
+    stop = Button(master, text="Stop", width=10, command=stop)
+    stop.pack()
+    pause = Button(master, text="Pause", width=10, command=pause)
+    pause.pack()
+    resu = Button(master, text="Resume", width=10, command=resume)
+    resu.pack()
+    lop = Button(master, text="Loop", width=10, command=loop)
+    lop.pack()
+else:
+    mc = Button(master, text="Controls", width=10, command=ctra)
+    mc.pack()
 
 e.pack()
 canvas = Canvas(master, width = 512, height = 512)      
 canvas.pack()      
 img = PhotoImage(file="data/assets/sc.png")      
-canvas.create_image(20,20, anchor=NW, image=img) 
+canvas.create_image(20,20, anchor=NW, image=img)
 
+inf = Button(master, text="Information", width=10, command=info)
+inf.pack()
 text = e.get()
 mainloop()
 
-text = content.get()
-content.set(text)
