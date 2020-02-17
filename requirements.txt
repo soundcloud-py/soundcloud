@@ -1,6 +1,4 @@
 pillow
 requests
 youtube_dl
-io
-base64
 pygame
