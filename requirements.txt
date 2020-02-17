@@ -1,0 +1,7 @@
+pillow
+requests
+tkinter
+youtube_dl
+io
+base64
+pygame
