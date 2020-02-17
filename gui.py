@@ -1,6 +1,6 @@
-version = "0.2.1"
+version = "0.2.2"
 
-# Discord RPC doesn't work for this version at the moment!
+# Discord RPC currently supported
 
 from tkinter import *
 import tkinter as tk
@@ -15,6 +15,7 @@ import urllib.request
 from urllib.request import urlopen
 import io
 import base64
+import webbrowser
 try:
     import rpc
     client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
