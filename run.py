@@ -22,6 +22,7 @@ import time
 
 IS_WINDOWS = os.name == "nt"
 IS_MAC = sys.platform == "darwin"
+#IS_LINUX = sys.platform == "linux"
 
 def clear_screen():
     if IS_WINDOWS:
@@ -37,12 +38,12 @@ youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'outtmpl': '%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
-    'noplaylist': True,
+    'noplaylist': False,
     'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
+    'ignoreerrors': True,
+    'logtostderr': True,
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
@@ -110,10 +111,12 @@ def from_url(url, *, loop=None, stream=False):
     
     if 'entries' in data:
         data = data['entries'][0]
-
+	
     filename = data['url'] if stream else ytdl.prepare_filename(data)
     pg.mixer.music.load(filename)
     print("Now Playing {}...".format(url))
+    ##clock = pg.time.Clock()
+    ##print("Elapsed time{}".time)
     pg.mixer.music.play()
     start_time = time.time()
     if discordsupport == True:
@@ -124,14 +127,17 @@ def from_url(url, *, loop=None, stream=False):
     while pg.mixer.music.get_busy():
         clock.tick(30)
     main()
-
-def main():
-    clear_screen()
-    urll = input('Enter a soundcloud track (EG: artucuno/wave) >>> ')
-    from_url(urll)
+try:
+	def main():
+    		clear_screen()
+    		urll = input('Enter a soundcloud track (EG: artucuno/wave) >>> ')
+    		from_url(urll)
+except KeyboardInterrupt:
+	print("\n\nSoundcloud has exited.")
+	sys.exit(0)
 
 try:
     main()
 except KeyboardInterrupt:
-    input("\n\nClosed Soundcloud!")
-    sys.exit(1)
+    print("\n\nSoundcloud has exited.")
+    sys.exit(0)
