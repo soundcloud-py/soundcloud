@@ -10,7 +10,7 @@ A Soundcloud Desktop Application
 # Supported Platforms
 - Windows
 - Linux
-- MacOS
+~~- MacOS~~ ***NOT TESTED ON.***
 
 # Installation
 1. `git clone https://github.com/Articuno1234/soundcloud.git`
