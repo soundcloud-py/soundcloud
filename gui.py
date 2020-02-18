@@ -68,7 +68,7 @@ def download_images(url, title=""):
         import urllib.request as uril
     except ImportError:
         import urllib as uril
-    uril.urlretrieve(url, "{}.jpg".format(title))
+    uril.urlretrieve(url)
 
 def discordup(track, url, aurl, artist=None):
     start_time = time.time()
@@ -232,8 +232,8 @@ def info():
     np = Label(infod, text="SoundCloud Client v{}\n"
                "--------\n"
                "Developers:\n"
-               "Artucuno#1898\n"
-               "\n"
+               "Artucuno#1898 (Articuno1234)\n"
+               "??? (BookishWaffle)\n"
                "--------\n"
                "".format(version))
     np.pack()

@@ -11,10 +11,13 @@ import os
 import sys
 import pygame as pg
 import rpc
-client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
-rpc_obj = rpc.DiscordIpcClient.for_platform(client_id)
-print("RPC connection successful.")
-discordsupport = True
+try:
+    client_id = '676288890331463700' #Soundcloud Client ID (Don't Change Unless you want to change the name)
+    rpc_obj = rpc.DiscordIpcClient.for_platform(client_id)
+    print("RPC connection successful.")
+    discordsupport = True
+except:
+    discordsupport = False
 import time
 
 IS_WINDOWS = os.name == "nt"
