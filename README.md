@@ -22,3 +22,5 @@ A Soundcloud Desktop Application
 
 # GUI version
 `python gui.py`
+
+# Join our discord for help
