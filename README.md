@@ -10,17 +10,17 @@ A Soundcloud Desktop Application
 # Supported Platforms
 - Windows
 - Linux
-~~- MacOS~~ ***NOT TESTED ON.***
+- ***macOS support coming soon.***
 
 # Installation
 1. `git clone https://github.com/Articuno1234/soundcloud.git`
 2. `cd soundcloud`
 3. `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
 
-# Cmd version
+# `cmd.exe` version
 `python run.py`
 
 # GUI version
 `python gui.py`
 
-# Join our discord for help
+# Join our Discord for help
